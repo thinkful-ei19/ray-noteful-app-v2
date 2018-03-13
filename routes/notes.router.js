@@ -2,6 +2,7 @@
 
 const express = require('express');
 
+
 // Create an router instance (aka "mini-app")
 const router = express.Router();
 
@@ -23,6 +24,18 @@ router.get('/notes', (req, res, next) => {
     })
     .catch(err => next(err)); 
   */
+  // .where('title', 'like', `%${searchTerm}%`)
+  knex.select('id', 'title', 'content')
+    .from('notes')
+    .where(function() {
+      if(searchTerm) {
+        this.where('title', 'like', `%${searchTerm}%`);
+      }
+    })
+    .then(results => {
+      res.json(results);
+    })
+    .catch(err => next(err));
 });
 
 /* ========== GET/READ SINGLE NOTES ========== */
@@ -40,6 +53,17 @@ router.get('/notes/:id', (req, res, next) => {
     })
     .catch(err => next(err));
   */
+  knex.select('id', 'title', 'content')
+    .from('notes')
+    .where('id', noteId)
+    .then(result => {
+      if(result) {
+        res.json(result);
+      } else {
+        next();
+      }
+    })
+    .catch(err => next(err));
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
@@ -73,6 +97,18 @@ router.put('/notes/:id', (req, res, next) => {
     })
     .catch(err => next(err));
   */
+  knex('notes')
+    .update(updateObj)
+    .where('id', noteId)
+    .returning(['id', 'title', 'content'])
+    .then(item => {
+      if(item) {
+        res.json(item);
+      } else {
+        next();
+      }
+    })
+    .catch(err => next(err));
 });
 
 /* ========== POST/CREATE ITEM ========== */
@@ -96,6 +132,16 @@ router.post('/notes', (req, res, next) => {
     })
     .catch(err => next(err));
   */
+  knex
+    .insert(newItem)
+    .into('notes')
+    .returning(['id', 'title', 'content'])
+    .then(item => {
+      if(item) {
+        res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+      }
+    })
+    .catch(err => next(err));
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
@@ -113,6 +159,18 @@ router.delete('/notes/:id', (req, res, next) => {
     })
     .catch(err => next(err));
   */
+  knex('notes')
+    .select('id', 'title', 'content')
+    .where('id', id)
+    .del()
+    .then(count => {
+      if(count) {
+        res.status(204).end();
+      } else {
+        next();
+      }
+    })
+    .catch(err => next(err));
 });
 
 module.exports = router;
