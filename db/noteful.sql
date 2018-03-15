@@ -2,6 +2,8 @@
 
 SELECT CURRENT_DATE;
 
+DROP TABLE IF EXISTS notes_tags;
+DROP TABLE IF EXISTS tags;
 DROP TABLE IF EXISTS notes;
 DROP TABLE IF EXISTS folders;
 
@@ -27,6 +29,20 @@ CREATE TABLE notes (
   created timestamp DEFAULT now(),
   folder_id int REFERENCES folders ON DELETE SET NULL
 );
+
+
+CREATE TABLE tags (
+    id serial PRIMARY KEY,
+    name text NOT NULL
+);
+
+
+CREATE TABLE notes_tags (
+  note_id INTEGER NOT NULL REFERENCES notes ON DELETE CASCADE,
+  tag_id INTEGER NOT NULL REFERENCES tags ON DELETE CASCADE
+);
+
+
 
 ALTER SEQUENCE notes_id_seq RESTART WITH 1000;
 
@@ -82,6 +98,23 @@ INSERT INTO notes (title, content, folder_id) VALUES
     100
   );
 
+INSERT INTO tags (name) VALUES
+  ('Golden State Warriors'),
+  ('Houston Rockets'),
+  ('LA Lakers'),
+  ('Minnesota Timberbolves');
+
+INSERT INTO notes_tags (note_id, tag_id) VALUES
+  (1000, 1),
+  (1001, 1), (1001, 2),
+  (1002, 1), (1002, 2), (1002, 3),
+  (1003, 1), (1003, 2), (1003, 3), (1003, 3),
+  (1004, 1),
+  (1005, 1), (1005, 2),
+  (1006, 1),
+  (1007, 1),
+  (1008, 1), (1008, 2), (1008, 3),
+  (1009, 1);
 
 
 

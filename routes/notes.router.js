@@ -33,7 +33,7 @@ router.get('/notes', (req, res, next) => {
         queryBuilder.where('folder_id', folderId);
       }
     })
-    .orderBy('notes.id')
+    .orderBy('notes.id', 'desc')
     .then(result => {
       res.json(result);
     })
@@ -44,7 +44,7 @@ router.get('/notes', (req, res, next) => {
 router.get('/notes/:id', (req, res, next) => {
   const noteId = req.params.id;
 
-  knex.select('notes.id', 'title', 'content', 'folders.id as folder_id', 'folders.name as folderName')
+  knex.first('notes.id', 'title', 'content', 'folders.id as folder_id', 'folders.name as folderName')
     .from('notes')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
     .modify(function(queryBuilder) {
