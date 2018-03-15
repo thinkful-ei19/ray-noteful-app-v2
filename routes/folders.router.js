@@ -6,7 +6,7 @@ const knex = require('../knex');
 
 const router = express.Router();
 
-// GET all tags
+// GET all folders
 router.get('/folders', (req, res, next) => {
     knex.select('id', 'name')
       .from('folders')
@@ -17,7 +17,7 @@ router.get('/folders', (req, res, next) => {
   });
 
 
-//GET single tag
+//GET single folder
 router.get('/folders/:id', (req, res, next) => {
     const folderId = req.params.id;
     knex.select('id', 'name')
@@ -47,7 +47,7 @@ router.put('/folders/:id', (req, res, next) => {
     }
   });
 
-  //Never truest Users = validate input
+  //Never trust users = validate input
   if (!updateObj.name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
