@@ -16,11 +16,16 @@ const notes = simDB.initialize(data);
 // Get All (and search by query)
 /* ========== GET/READ ALL NOTES ========== */
 router.get('/notes', (req, res, next) => {
-  const {searchTerm, folderId} = req.query;
+  const {searchTerm, folderId, tagId} = req.query;
   
-  knex.select('notes.id', 'title', 'content', 'folders.id as folder_id', 'folders.name as folderName')
+  knex.select('notes.id', 'title', 'content', 
+    'folders.id as Folder ID', 'folders.name as Folder Name', 
+    'tags.id as Tag ID', 'tags.name as Tag Name')
     .from('notes')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
+    .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
+    .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
+    
     .modify(function (queryBuilder) {
       console.log(queryBuilder);
       
@@ -31,6 +36,11 @@ router.get('/notes', (req, res, next) => {
     .modify(function (queryBuilder) {
       if (folderId) {
         queryBuilder.where('folder_id', folderId);
+      }
+    })
+    .modify(function (queryBuilder) {
+      if(tagId) {
+        queryBuilder.where('tags_id', tagId);
       }
     })
     .orderBy('notes.id', 'desc')
