@@ -37,3 +37,6 @@ knex.select(1).then(res => console.log(res));
 //   .where('id', '1002')
 //   .del()
 //   .then(result => console.log(result));
+
+
+
