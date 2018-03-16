@@ -29,7 +29,7 @@ router.get('/notes', (req, res, next) => {
     .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
     
     .modify(function (queryBuilder) {
-      console.log(queryBuilder);
+      // console.log(queryBuilder);
       
       if (searchTerm) {
         queryBuilder.where('title', 'like', `%${searchTerm}%`);
@@ -45,7 +45,7 @@ router.get('/notes', (req, res, next) => {
         queryBuilder.where('tag_id', tagId);
       }
     })
-    .orderBy('notes.id', 'desc')
+    .orderBy('notes.id')
     .then(result => {
       if(result) {
         const hydrated = hydrateNotes(result);
@@ -136,10 +136,14 @@ router.put('/notes/:id', (req, res, next) => {
 
 /* ========== POST/CREATE ITEM ========== */
 router.post('/notes', (req, res, next) => {
-  const { title, content, folder_id } = req.body; // Add `folder_id`
-  /*
-  REMOVED FOR BREVITY
-  */
+  const { title, content, folder_id, tags = [] } = req.body; // Add `folder_id`
+  console.log('-------', req.body);
+  if(!title) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    return next(err);
+  }
+  
   const newItem = {
     title: title,
     content: content,
