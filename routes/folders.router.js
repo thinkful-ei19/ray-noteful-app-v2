@@ -20,7 +20,7 @@ router.get('/folders', (req, res, next) => {
 //GET single folder
 router.get('/folders/:id', (req, res, next) => {
     const folderId = req.params.id;
-    knex.select('id', 'name')
+    knex.first('id', 'name')
         .from('folders')
         .where('id', folderId)
         .then(result => {
